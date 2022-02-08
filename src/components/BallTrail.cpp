@@ -40,7 +40,7 @@ namespace pong
     {
         // Cache the ball component on startup
         ball = TUtils::GetComponentFromEntity<Ball>(entityID);
-        ballPos = &Entity::GetEntity(ballRef)->position;
+        ballPos = Entity::GetEntity(ballRef)->GetPositionPtr();
 
         // Initialize the particles' entity since we should be registered to it by now
         for (auto &&part : *parts)

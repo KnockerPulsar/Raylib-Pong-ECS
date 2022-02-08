@@ -15,7 +15,7 @@ namespace pong
     {
     public:
         std::unordered_map<int, Entity *> entites; // Entities keyed by their entity ID
-        std::vector<Event *> events;
+        std::vector<Event> events;
         std::unordered_map<pong::tags, pong::System *, pong::TagsHashClass> systems;
 
         // Only one transition should be active at any time
@@ -66,7 +66,7 @@ namespace pong
             // If an event completed, store its index
             // so we can remove it from the vector
             for (int i = 0; i < events.size(); i++)
-                if (events[i]->Tick(dT))
+                if (events[i].Tick(dT))
                     toBeRemovedInd.push_back(i);
 
             /* 
@@ -114,7 +114,7 @@ namespace pong
         template <typename func>
         void AddEvent(float delay, func &&fun, int repititions = 1, float repititionDelay = 1)
         {
-            Event *ev = new Event(delay, fun, repititions, repititionDelay);
+            Event ev = Event(delay, fun, repititions, repititionDelay);
             events.push_back(ev);
         }
     };

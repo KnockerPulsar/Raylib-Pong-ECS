@@ -10,16 +10,35 @@
 namespace pong
 {
 
-    Entity::Entity(float x, float y)
+    Entity::Entity(float x, float y, bool movable ) : movable(movable)
     {
         entityID = Utils::GetUniqueID();
-        initPos = raylib::Vector2(x,y);
+        initPos = raylib::Vector2(x, y);
         position = initPos;
 
         Game::currScene->entites[entityID] = this;
     }
-    
+
     Entity::~Entity() { TraceLog(LOG_DEBUG, "Entity destroyed"); }
+
+    void Entity::Move(raylib::Vector2 moveAmount)
+    {
+        if (movable)
+            position += moveAmount;
+        else
+            TraceLog(LOG_WARNING, "Trying to move an immovable object");
+    }
+
+    void Entity::SetPosition(raylib::Vector2 newPosition)
+    {
+        if (movable)
+            position = newPosition;
+        else
+            TraceLog(LOG_WARNING, "Trying to move an immovable object");
+    }
+
+    raylib::Vector2 Entity::GetPosition() { return position; }
+    raylib::Vector2 *Entity::GetPositionPtr() { return &position; }
 
     void Entity::Reset()
     {
@@ -28,7 +47,6 @@ namespace pong
         {
             comp.second->Reset();
         }
-        
     }
 
     std::vector<Component *> *Entity::GetComponents(const std::type_index &type)
@@ -68,7 +86,7 @@ namespace pong
         return Game::currScene->entites[id];
     }
 
-    Entity& Entity::AddComponent(pong::Component *component)
+    Entity &Entity::AddComponent(pong::Component *component)
     {
         auto systems = Game::currScene->systems;
 

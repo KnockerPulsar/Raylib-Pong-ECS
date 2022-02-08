@@ -42,7 +42,7 @@ namespace pong
     void Ball::Start()
     {
         // Should already be registered to an entity by this points
-        position = &Entity::GetEntity(entityID)->position;
+        position = Entity::GetEntity(entityID)->GetPositionPtr();
         initialPos = *position;
         Reset();
     }
@@ -73,7 +73,7 @@ namespace pong
             return;
 
         float deltaTime = GetFrameTime();
-        *position += velocity * std::min(deltaTime, (float)1.0 / 60);
+        GetEntity()->Move(velocity * std::min(deltaTime, (float)1.0 / 60));
     }
 
     void Ball::Update()
@@ -162,7 +162,7 @@ namespace pong
 
         if (mainGame && pad->score > mainGame->maxScore)
         {
-            // All of this can probably be replaced with the entity ID 
+            // All of this can probably be replaced with the entity ID
             mainGame->maxScore = pad->score;
             mainGame->winnerNum = pad->playerNum;
             mainGame->winnerColor = pad->BoxColor;

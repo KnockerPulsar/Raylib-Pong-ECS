@@ -53,7 +53,7 @@ namespace pong
             FillSegment();
         }
 
-        void Start() override { this->position = &GetEntity()->position; }
+        void Start() override { this->position = GetEntity()->GetPositionPtr(); }
 
         void Reset() override
         {
@@ -72,6 +72,8 @@ namespace pong
         void CheckInput()
         {
             float deltaTime = GetFrameTime();
+            float yMoveAmount = 0;
+            Entity *entity = GetEntity();
 
             // If p1 pressed W or p2 pressed Up
             if ((playerNum == 1 && IsKeyDown(KEY_W)) || (playerNum == 2 && IsKeyDown(KEY_UP)))
@@ -80,10 +82,10 @@ namespace pong
                 float newY = position->y - deltaTime * speed;
 
                 if (newY <= 0)
-                    position->y = 0;
-                // Otherwise, move up
+                    entity->SetPosition(
+                        {entity->GetPosition().x, 0});
                 else
-                    position->y -= deltaTime * speed;
+                    yMoveAmount = -deltaTime * speed;
             }
 
             // Similar to the previous block, but checks if the the bottom edge of the paddle touched the bottom edge
@@ -93,10 +95,13 @@ namespace pong
                 int screenHeight = GetScreenHeight();
 
                 if (newY >= screenHeight - size.y)
-                    position->y = screenHeight - size.y;
+                    entity->SetPosition(
+                        {entity->GetPosition().x, screenHeight - size.y});
                 else
-                    position->y += deltaTime * speed;
+                    yMoveAmount = deltaTime * speed;
             }
+
+            entity->Move({0, yMoveAmount});
         }
 
         void FillSegment()
@@ -124,7 +129,7 @@ namespace pong
                 // Figure out which segment to fill
                 // Segments are ordered from 0 - NUM_SEGMENTS-1 from top to bottom
                 // Note that the paddle's position starts at the upper left corner
-                float dy = other->GetEntity()->position.y - position->y;
+                float dy = other->GetEntity()->GetPosition().y - position->y;
 
                 // If dy < segsize , dy/segSize = 0
                 //    dy > segSize , dy/segSize = 1

@@ -49,8 +49,16 @@ namespace pong
 
             // Common paddle variables
             raylib::Vector2 PaddleSize{15, 100};
-            float PaddleSpeed = 1000, ballRadius = 10, ballSpeed = 512,
-                  screenWidth = GetScreenWidth(), screenHeight = GetScreenHeight();
+            float
+                PaddleSpeed = 1000,
+                ballRadius = 10,
+                ballSpeed = 512,
+                screenWidth = GetScreenWidth(),
+                screenHeight = GetScreenHeight(),
+                screenYMid = screenHeight / 2,
+                screenXMid = screenWidth / 2,
+                halfPaddleHeight = PaddleSize.y / 2,
+                halfPaddleWidth = PaddleSize.x / 2;
 
             int scoreSize = 90;
 
@@ -59,9 +67,9 @@ namespace pong
             // Entity creation
             float offset = 10;
             static pong::Entity
-                lPaddle(PaddleSize.x, screenHeight / 2 - PaddleSize.y / 2),
-                rPaddle(screenWidth - PaddleSize.x * 2, screenHeight / 2 - PaddleSize.y / 2),
-                ball((float)(screenWidth / 2), (float)(screenHeight / 2)),
+                lPaddle(PaddleSize.x, screenYMid - halfPaddleHeight, true),
+                rPaddle(screenWidth - PaddleSize.x * 2, screenYMid - halfPaddleHeight, true),
+                ball((float)(screenXMid), (float)(screenYMid), true),
                 tWall(0, offset),
                 bWall(0, screenHeight - offset),
                 lNet(offset, 0),

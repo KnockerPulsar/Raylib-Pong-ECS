@@ -6,7 +6,11 @@
 - TODO: Iterator invalidation when deleting components or entities while iterating over a vector of them. (Not a big issue right now)
 
 - TODO: Instead of remaking the whole quadtree for a mostly static scene, we can mark each collider as "static" or
-"dynamic", then we only need to rebuild the nodes for dynamic colliders
+"dynamic", then we only need to rebuild the nodes for dynamic colliders.
+  We'll keep a copy of the quadtree with only static colliders.
+  At the start of each frame, we'll replace the old tree with the static tree. Then we'll iterate over colliders
+  As we iterate over colliders, we check if the collider is static or dynamic.
+  If a collider is dynamic, then we add it to the tree.
 
 - TODO: More TODO's
 
@@ -19,8 +23,6 @@
     or calls that will be called a certain number of frames/time. (foo() for every frame for 0.5 seconds for example)
     Take into account if the event should repeat for the event queue sorting function so that repeated events are not popped.
     Added a repitition count for events. Reptitions will have the same delay as the original call. 
-
-
 
 # Meh
   - Convert the event vector to a queue that's sorted by delay.

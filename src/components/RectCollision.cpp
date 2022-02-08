@@ -11,21 +11,34 @@ namespace pong
 
     RectCollision::RectCollision(float w, float h) : width(w), height(h) {}
 
+    RectCollision::RectCollision(float w, float h)
+        : width(w), height(h)
+    {
+    }
+
+    RectCollision::RectCollision(const RectCollision &rc)
+    {
+        this->width = rc.width;
+        this->height = rc.height;
+    }
+
     RectCollision::~RectCollision() {}
 
     void RectCollision::Update() { DrawDebug(); }
 
-    void RectCollision::Start() { position = &GetEntity()->position; }
+    void RectCollision::Start() {}
 
     void RectCollision::DrawDebug(raylib::Color col)
     {
-        DrawRectangle(position->x, position->y, width, height, col);
-        DrawRectangleLines(position->x, position->y, width, height, col);
+        raylib::Vector2 position = GetPosition();
+        DrawRectangle(position.x, position.y, width, height, col);
+        DrawRectangleLines(position.x, position.y, width, height, col);
     }
 
     Rectangle RectCollision::GetRect()
     {
-        return (Rectangle){position->x, position->y, width, height};
+        return (Rectangle){
+            GetPosition().x, GetPosition().y, width, height};
     }
 
     bool RectCollision::CheckCollision(Component *other) { return other->CheckCollision(this); }
@@ -36,7 +49,7 @@ namespace pong
     bool RectCollision::CheckCollision(BallCollision *other)
     {
         Rectangle rect = this->GetRect();
-        return CheckCollisionCircleRec(*other->position, other->radius, rect);
+        return CheckCollisionCircleRec(other->GetPosition(), other->radius, rect);
     }
 
     // Rect-Rect collision

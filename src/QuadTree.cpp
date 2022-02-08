@@ -12,7 +12,7 @@ namespace pong
     std::tuple<float, float, float, float> GetChildCoords(RectCollision *rect, int childIndex)
     {
         float xc, yc,
-            x = rect->position->x, y = rect->position->y,
+            x = rect->GetPosition().x, y = rect->GetPosition().y,
             w = rect->width, h = rect->height;
         switch (childIndex)
         {
@@ -53,6 +53,22 @@ namespace pong
         children = std::vector<QuadTree *>(NUM_CHILDREN, nullptr);
     }
 
+    QuadTree::QuadTree(const QuadTree &qt) : capacity(qt.capacity), collision(qt.collision)
+    {
+        children = std::vector<QuadTree *>(NUM_CHILDREN, nullptr);
+
+        for (int i = 0; i < qt.children.size(); i++)
+        {
+            if (qt.children[i] != nullptr)
+            {
+                children[i] = new QuadTree(qt.children[i]->collision, qt.capacity);
+            }
+        }
+
+        this->contained = qt.contained;
+        this->subdivided = qt.subdivided;
+    }
+
     void QuadTree::Insert(Component *comp, int depth)
     {
         BallCollision *ball = TUtils::GetTypePtr<BallCollision>(comp);
@@ -88,7 +104,6 @@ namespace pong
             auto [x, y, w, h] = GetChildCoords(&collision, i);
             raylib::Vector2 *vec = new raylib::Vector2(x, y);
             RectCollision childColl = RectCollision(w, h);
-            childColl.position = vec;
 
             childColl.entityID = 69;
             children[i] = new QuadTree(childColl, capacity);
@@ -119,10 +134,36 @@ namespace pong
 
     QuadTree::~QuadTree()
     {
+        if (children[0] != nullptr)
+            for (auto &&child : children)
+                delete child;
 
-        for (auto &&child : children)
-            delete child;
         currQuads = 0;
         delete collision.position;
+    }
+
+    QuadTree &QuadTree::operator=(QuadTree &right)
+    {
+        return CopyQuadtree(&right);
+    }
+
+    QuadTree &QuadTree::CopyQuadtree(QuadTree *root)
+    {
+
+        if (!(root->children[0] || root->children[1] || root->children[2] || root->children[3]))
+            return *root;
+
+        QuadTree *newTree = new QuadTree(root->collision, 0);
+
+        for (int i = 0; i < root->children.size(); i++)
+        {
+            if (root->children[i])
+            {
+                QuadTree qt = CopyQuadtree(root->children[i]);
+                newTree->children[i] = &qt;
+            }
+        }
+
+        return *newTree;
     }
 }

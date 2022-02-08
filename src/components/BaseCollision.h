@@ -16,7 +16,6 @@ namespace pong
     class BaseCollision : public Component
     {
     public:
-        Vector2 *position;                                    // Should be initialized in Start() to the enitity's position
         std::unordered_map<int, Component *> collidingWith{}; // A list of other collisions this collision is colliding with
         std::vector<QuadTree *> currentNodes{};               // A list of all the nodes this collision is in
 
@@ -26,7 +25,10 @@ namespace pong
         virtual void Update() = 0;
 
         // Should be called if you implement your own start function
-        virtual void Start() { position = &GetEntity()->position; tag = tags::coll;}
+        virtual void Start()
+        {
+            tag = tags::coll;
+        }
 
         // Default color is transparent green
         virtual void DrawDebug(raylib::Color col = raylib::Color(226, 28, 255, 240));
@@ -49,5 +51,7 @@ namespace pong
 
         // Checks if this collider is not on screen, useful for edge cases
         virtual bool IsNotOnScreen() = 0;
+
+        raylib::Vector2 GetPosition(){return GetEntity()->GetPosition();}
     };
 }

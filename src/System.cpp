@@ -10,6 +10,7 @@ namespace pong
 {
     System::System(tags compTag)
     {
+        tag = compTag;
         switch (compTag)
         {
         case tags::indep:
@@ -31,8 +32,8 @@ namespace pong
 
     System::~System()
     {
-        if (root)
-            delete root;
+        if (dynamicQuadtreeRoot)
+            delete dynamicQuadtreeRoot;
     }
 
     // TODO: Use enable_if and SFINAE to make this look better
@@ -62,11 +63,11 @@ namespace pong
     {
         UpdateIndependent(); // For debugging, shows colliders
 
-        #ifdef QUAD_COLLISION
+#ifdef QUAD_COLLISION
         QuadTreeCollision();
-        #else
+#else
         NaiveCollision();
-        #endif
+#endif
     }
 
     void System::UpdateBlendedParticles()
@@ -114,9 +115,9 @@ namespace pong
     {
         BuildQuadTree();
 
-        #ifdef QUAD_COLLISION_DRAW
-            root->Draw(raylib::Color(0, 228, 48, 50), raylib::Color::Red());
-        #endif
+#ifdef QUAD_COLLISION_DRAW
+        root->Draw(raylib::Color(0, 228, 48, 50), raylib::Color::Red());
+#endif
 
         for (auto &&compA : systemComponents)
         {
@@ -156,10 +157,22 @@ namespace pong
 
     void System::Start()
     {
+        if (tag == tags::coll)
+        {
+            RectCollision rectColl = RectCollision(GetScreenWidth(), GetScreenHeight(), raylib::Vector2::Zero());
+            staticQuadtreeRoot = new QuadTree(
+                rectColl, 2);
+        }
+
         for (auto &&comp : systemComponents)
         {
             comp->Start();
+
+            if (tag == tags::coll && !comp->GetEntity()->movable)
+                staticQuadtreeRoot->Insert(comp, 0);
         }
+        if (tag == tags::coll)
+            dynamicQuadtreeRoot = new QuadTree(*staticQuadtreeRoot);
     }
 
     void System::AddComponent(Component *component)
@@ -194,26 +207,19 @@ namespace pong
 
     void System::BuildQuadTree()
     {
-        if (root)
+        if (dynamicQuadtreeRoot)
         {
-            // delete root->collision.position;
-            delete root;
-            root = nullptr;
+            delete dynamicQuadtreeRoot;
+            dynamicQuadtreeRoot = new QuadTree(*staticQuadtreeRoot);
             for (auto &&comp : systemComponents)
             {
                 TUtils::GetTypePtr<BaseCollision>(comp)->currentNodes.clear();
             }
         }
-        raylib::Vector2 *vec = new raylib::Vector2();
-        RectCollision rootColl = RectCollision(GetScreenWidth(), GetScreenHeight());
-        rootColl.position = vec;
 
-        rootColl.entityID = 6969;
-
-        root = new QuadTree(rootColl, 2);
         for (auto &&comp : systemComponents)
         {
-            root->Insert(comp, 0);
+            dynamicQuadtreeRoot->Insert(comp, 0);
         }
     }
 } // namespace pong

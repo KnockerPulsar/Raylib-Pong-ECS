@@ -26,10 +26,8 @@ namespace pong
     class QuadTree
     {
     private:
-
         static int currQuads;
         int myNum = 0;
-
 
     public:
         // 0 top left, 1 top right, 2 bot left, 3 bot right
@@ -40,15 +38,19 @@ namespace pong
         bool subdivided = false;
 
         QuadTree(RectCollision &, int);
+        QuadTree(const QuadTree &qt);
         ~QuadTree();
         void Insert(Component *, int);
-        void Subdivide(std::vector<Component*>&);
+        void Subdivide(std::vector<Component *> &);
 
         // Given a certain primitive, should get all colliders inside it
         // Not needed right now
-        void Query(BaseCollision *);  
+        void Query(BaseCollision *);
 
         void Draw(raylib::Color, raylib::Color);
         void PrintDebug(int);
+
+        QuadTree &operator=(QuadTree &right);
+        QuadTree &CopyQuadtree(QuadTree *root);
     };
 }

@@ -24,7 +24,10 @@ namespace pong
         std::function<void(System *)> updateSystem;
 
         // For collision systems only, points to the root of the quad tree
-        QuadTree *root = nullptr;
+        QuadTree *dynamicQuadtreeRoot = nullptr;
+        QuadTree *staticQuadtreeRoot = nullptr;
+
+        tags tag;
 
         // Sets the update function corresponding to each system type
         System(tags compTag);

@@ -25,8 +25,11 @@ namespace pong
             : delay(initDel), fn(fn), repetitions(repetitions), repititionDelay(repDelay)
         {
             // Check if the given repitition amount is -ve
-            this->repetitions = repetitions < 0 ? 1 : repetitions;
-            TraceLog(LOG_WARNING, "Negative repetitions given to event, setting repetitions to 1.");
+            if (repetitions < 0)
+            {
+                TraceLog(LOG_WARNING, "Negative repetitions given to event, setting repetitions to 1.");
+                repetitions = 1;
+            }
         }
         ~Event() {}
 
